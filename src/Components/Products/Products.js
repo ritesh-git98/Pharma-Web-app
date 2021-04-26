@@ -41,61 +41,64 @@ const tableIcons = {
 };
 var columns = [
     { title: "id", field: "id", hidden: true },
-    { title: "Name", field: "name" },
-    { title: "Manufacturer Name", field: "brand" },
-    { title: "Price", field: "price", type: "number" },
-    { title: "Stock", field: "stock", type: "number" },
-    { title: "Discount", field: "discount", type: "number" }
+    { title: "Customer Name", field: "customerName" },
+    { title: "Customer Contact Number", field: "contact" },
+    { title: "Products", field: "productName"},
+    { title: "Quantity", field: "quantity", type: "number" },
+    { title: "Total Amount (in Rs.)", field: "price", type: "number" }
 ]
-
-const Products = (props) => {
+const Orders = (props) => {
     let log = window.localStorage.getItem('userType');
     if(log===null){
         props.history.push('/')
     }
+    let ordersData = JSON.parse(window.localStorage.getItem('ordersData'))
+    if(ordersData == null){
+        ordersData = [{"id":0,"customerName":"null","contact":"null","productName":"null","quantity":"null","price":"null"}];
+    }
+    var auth=false;
     if(log === "salesexecutive"){
-        props.history.push('/orders')
+        auth=true;
     }
-    let productData = JSON.parse(window.localStorage.getItem('productData'))
-    if(productData == null){
-        productData = [{"id":0,"name":"null","brand":"null","price":"null","stock":"null","discount":"null"}];
+    if(log === "storemanager"){
+        auth=false;
     }
-    const [dataForDisplay,setDataForDisplay] = useState(productData);
+    const [dataForDisplay,setDataForDisplay] = useState(ordersData);
     const handleRowAdd = (newData, resolve) => {
         newData.id = new Date().getTime();
-        if (newData.name === undefined || newData.brand === undefined || newData.price === undefined || newData.stock === undefined || newData.discount === undefined) {
+        if (newData.customerName === undefined || newData.contact === undefined || newData.productName === undefined || newData.quantity === undefined || newData.price === undefined) {
             alert("Please enter all details")
             resolve();
         }
         else {
-            let productData = window.localStorage.getItem('productData')
-            if (productData === null) {
-                productData = []
-                productData.push(newData)
-                window.localStorage.setItem('productData', JSON.stringify(productData))
+            let ordersData = window.localStorage.getItem('ordersData')
+            if (ordersData === null) {
+                ordersData = []
+                ordersData.push(newData)
+                window.localStorage.setItem('ordersData', JSON.stringify(ordersData))
             }
             else {
-                productData = JSON.parse(window.localStorage.getItem('productData'))
-                productData.push(newData)
-                window.localStorage.setItem('productData', JSON.stringify(productData))
+                ordersData = JSON.parse(window.localStorage.getItem('ordersData'))
+                ordersData.push(newData)
+                window.localStorage.setItem('ordersData', JSON.stringify(ordersData))
             }
-            setDataForDisplay(productData);
+            setDataForDisplay(ordersData);
             resolve()
         }
     }
 
     const handleRowDelete = (oldData, resolve) => {
         let id = oldData.id;
-        let productData = window.localStorage.getItem('productData')
-        productData = JSON.parse(productData);
-        var newData = productData.filter(function (value) {
+        let ordersData = window.localStorage.getItem('ordersData')
+        ordersData = JSON.parse(ordersData);
+        var newData = ordersData.filter(function (value) {
             return value.id != id;
         });
         if(newData === null){
             newData = [{"id":0,"name":"null","brand":"null","price":"null","stock":"null","discount":"null"}];
         }
         setDataForDisplay(newData)
-        window.localStorage.setItem('productData', JSON.stringify(newData))
+        window.localStorage.setItem('ordersData', JSON.stringify(newData))
         resolve();
     }
     const handleRowUpdate = (newData, oldData, resolve) => {
@@ -104,46 +107,46 @@ const Products = (props) => {
             resolve();
         }
         let id = oldData.id;
-        let productData = window.localStorage.getItem('productData')
-        productData = JSON.parse(productData);
-        var data1 = productData.filter(function (value) {
+        let ordersData = window.localStorage.getItem('ordersData')
+        ordersData = JSON.parse(ordersData);
+        var data1 = ordersData.filter(function (value) {
             return value.id != id;
         });
         newData.id = new Date().getTime();
         data1.push(newData);
         setDataForDisplay(data1)
-        window.localStorage.removeItem('productData');
-        window.localStorage.setItem('productData', JSON.stringify(data1))
+        window.localStorage.removeItem('ordersData');
+        window.localStorage.setItem('ordersData', JSON.stringify(data1))
         resolve()
     }
+    const edits =auth ? '':{
+        onRowUpdate: (newData, oldData) =>
+            new Promise((resolve) => {
+                handleRowUpdate(newData, oldData, resolve);
+            }),
+        onRowAdd: (newData) =>
+            new Promise((resolve) => {
+                handleRowAdd(newData, resolve)
+            }),
+        onRowDelete: (oldData) =>
+            new Promise((resolve) => {
+                handleRowDelete(oldData, resolve)
+            })
+    };
     return (
         <>
             <Topbar />
             <div className="outer-wrapper">
                 <MaterialTable
-                    title="Medicine data"
+                    title="Orders data"
                     columns={columns}
                     data={dataForDisplay}
                     icons={tableIcons}
-                    editable={{
-                        onRowUpdate: (newData, oldData) =>
-                            new Promise((resolve) => {
-                                handleRowUpdate(newData, oldData, resolve);
-                            }),
-                        onRowAdd: (newData) =>
-                            new Promise((resolve) => {
-                                handleRowAdd(newData, resolve)
-                            }),
-                        onRowDelete: (oldData) =>
-                            new Promise((resolve) => {
-                                handleRowDelete(oldData, resolve)
-                            })
-                    }
-                    }
+                    editable={edits}
                 />
             </div>
             </>
     )
 }
-
-export default Products;
+ 
+export default Orders;
