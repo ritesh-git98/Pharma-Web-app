@@ -102,7 +102,7 @@ const Orders = (props) => {
         resolve();
     }
     const handleRowUpdate = (newData, oldData, resolve) => {
-        if (newData.firstName === undefined || newData.lastName === undefined || newData.dob === undefined || newData.gender === undefined || newData.expYrs === undefined) {
+        if (newData.customerName === undefined || newData.contact === undefined || newData.productName === undefined || newData.quantity === undefined || newData.price === undefined) {
             alert("Please enter all details")
             resolve();
         }
