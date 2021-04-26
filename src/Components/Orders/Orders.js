@@ -43,27 +43,27 @@ var columns = [
     { title: "id", field: "id", hidden: true },
     { title: "Customer Name", field: "customerName" },
     { title: "Customer Contact Number", field: "contact" },
-    { title: "Products", field: "productName"},
+    { title: "Products", field: "productName" },
     { title: "Quantity", field: "quantity", type: "number" },
     { title: "Total Amount (in Rs.)", field: "price", type: "number" }
 ]
 const Orders = (props) => {
     let log = window.localStorage.getItem('userType');
-    if(log===null){
+    if (log === null) {
         props.history.push('/')
     }
     let ordersData = JSON.parse(window.localStorage.getItem('ordersData'))
-    if(ordersData == null){
-        ordersData = [{"id":0,"customerName":"null","contact":"null","productName":"null","quantity":"null","price":"null"}];
+    if (ordersData == null) {
+        ordersData = [{ "id": 0, "customerName": "null", "contact": "null", "productName": "null", "quantity": "null", "price": "null" }];
     }
-    var auth=false;
-    if(log === "salesexecutive"){
-        auth=true;
+    var auth = false;
+    if (log === "salesexecutive") {
+        auth = true;
     }
-    if(log === "storemanager"){
-        auth=false;
+    if (log === "storemanager") {
+        auth = false;
     }
-    const [dataForDisplay,setDataForDisplay] = useState(ordersData);
+    const [dataForDisplay, setDataForDisplay] = useState(ordersData);
     const handleRowAdd = (newData, resolve) => {
         newData.id = new Date().getTime();
         if (newData.customerName === undefined || newData.contact === undefined || newData.productName === undefined || newData.quantity === undefined || newData.price === undefined) {
@@ -94,8 +94,8 @@ const Orders = (props) => {
         var newData = ordersData.filter(function (value) {
             return value.id != id;
         });
-        if(newData === null){
-            newData = [{"id":0,"name":"null","brand":"null","price":"null","stock":"null","discount":"null"}];
+        if (newData === null) {
+            ordersData = [{ "id": 0, "customerName": "null", "contact": "null", "productName": "null", "quantity": "null", "price": "null" }];
         }
         setDataForDisplay(newData)
         window.localStorage.setItem('ordersData', JSON.stringify(newData))
@@ -119,26 +119,27 @@ const Orders = (props) => {
         window.localStorage.setItem('ordersData', JSON.stringify(data1))
         resolve()
     }
-    const edits =auth ? {onRowAdd: (newData) =>
-        new Promise((resolve) => {
-            handleRowAdd(newData, resolve)
-        })
-    }
-    :
-    {
-        onRowUpdate: (newData, oldData) =>
-            new Promise((resolve) => {
-                handleRowUpdate(newData, oldData, resolve);
-            }),
+    const edits = auth ? {
         onRowAdd: (newData) =>
             new Promise((resolve) => {
                 handleRowAdd(newData, resolve)
-            }),
-        onRowDelete: (oldData) =>
-            new Promise((resolve) => {
-                handleRowDelete(oldData, resolve)
             })
-    };
+    }
+        :
+        {
+            onRowUpdate: (newData, oldData) =>
+                new Promise((resolve) => {
+                    handleRowUpdate(newData, oldData, resolve);
+                }),
+            onRowAdd: (newData) =>
+                new Promise((resolve) => {
+                    handleRowAdd(newData, resolve)
+                }),
+            onRowDelete: (oldData) =>
+                new Promise((resolve) => {
+                    handleRowDelete(oldData, resolve)
+                })
+        };
     return (
         <>
             <Topbar />
@@ -151,8 +152,8 @@ const Orders = (props) => {
                     editable={edits}
                 />
             </div>
-            </>
+        </>
     )
 }
- 
+
 export default Orders;
