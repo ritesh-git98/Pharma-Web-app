@@ -66,7 +66,7 @@ const Orders = (props) => {
     const [dataForDisplay,setDataForDisplay] = useState(ordersData);
     const handleRowAdd = (newData, resolve) => {
         newData.id = new Date().getTime();
-        if (newData.name === undefined || newData.brand === undefined || newData.price === undefined || newData.stock === undefined || newData.discount === undefined) {
+        if (newData.customerName === undefined || newData.contact === undefined || newData.productName === undefined || newData.quantity === undefined || newData.price === undefined) {
             alert("Please enter all details")
             resolve();
         }
@@ -119,7 +119,13 @@ const Orders = (props) => {
         window.localStorage.setItem('ordersData', JSON.stringify(data1))
         resolve()
     }
-    const edits =auth ? '':{
+    const edits =auth ? {onRowAdd: (newData) =>
+        new Promise((resolve) => {
+            handleRowAdd(newData, resolve)
+        })
+    }
+    :
+    {
         onRowUpdate: (newData, oldData) =>
             new Promise((resolve) => {
                 handleRowUpdate(newData, oldData, resolve);
